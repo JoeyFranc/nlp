@@ -42,7 +42,7 @@ class sixfourEmbeddingVectorizer(object):
 
     def transform(self, X):
         vec = np.array([
-        	np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array([np.zeros(self.dim)]) for w in range(64)])
+        	np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array(np.zeros(self.dim)) for w in range(64)])
             for words in X
         ])
         return vec
