@@ -55,6 +55,7 @@ train['news'] = train['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in r
 test['news'] = test['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in re.findall("\S+",x) if re.search('\w',i)!=None])
 valid['news'] = valid['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in re.findall("\S+",x) if re.search('\w',i)!=None])
 
+train_model, w2v = word2vec(train, 'train')
 
 Emb = sixfourEmbeddingVectorizer(w2v)
 train_embedding = Emb.transform(train.news)
