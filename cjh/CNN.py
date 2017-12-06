@@ -25,18 +25,16 @@ from keras import initializers
 
 def create_model(F, K, T):
 	first = Sequential()
-	first.add(Conv2D(filters = 128, input_shape=(F,K,1), kernel_initializer=initializers.RandomNormal(stddev=0.02),kernel_size = (3, 3), activation = 'relu'))
+	first.add(Conv2D(filters = 128, input_shape=(F,K,1), kernel_initializer=initializers.RandomNormal(stddev=0.01),kernel_size = (2, 2), activation = 'relu'))
 	first.add(MaxPooling2D((2, 2), strides=(2,2)))
 	first.add(Dropout(0.8))
-	first.add(Conv2D(filters=128, kernel_initializer=initializers.RandomNormal(stddev=0.02),kernel_size=(3, 3), activation='relu'))
-	first.add(MaxPooling2D((3, 3), strides=(2, 2)))
+	first.add(Conv2D(filters=128, kernel_initializer=initializers.RandomNormal(stddev=0.01),kernel_size=(3, 3), activation='relu'))
+	first.add(MaxPooling2D((2, 2), strides=(2, 2)))
 	first.add(Dropout(0.8))
-	first.add(Conv2D(filters=128, kernel_initializer=initializers.RandomNormal(stddev=0.02), kernel_size=(3, 3),activation='relu'))
-	first.add(MaxPooling2D((4, 4), strides=(2, 2)))
+	first.add(Conv2D(filters=128, kernel_initializer=initializers.RandomNormal(stddev=0.01), kernel_size=(4, 4),activation='relu'))
+	first.add(MaxPooling2D((2, 2), strides=(2, 2)))
 	first.add(Dropout(0.8))
 	first.add(Flatten())
-	first.add(Dense(T, kernel_initializer=initializers.RandomNormal(stddev=0.02),activation='relu'))
-	first.add(Dropout(0.8))
 	first.add(Dense(T, activation = 'softmax',kernel_initializer=initializers.RandomNormal(stddev=0.02),))
 	sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 	first.compile(loss='categorical_crossentropy',
@@ -47,8 +45,8 @@ def create_model(F, K, T):
 #suppose word_embedding _matrix n * f * k, feature_matrix n* c, label with one-hot encoding n*t
 #Y_train = keras.utils.to_categorical(label1, num_classes=6) for one-hot encoding
 
-def cnn(m_train, m_test, m_valid, y_train, y_valid):
-	batch_size = 4
+def run(m_train, m_valid, y_train, y_valid):
+	batch_size = 50
 	nb_epoch = 5
 	N, F, K = m_train.shape
 	T = y_train.shape[1]
