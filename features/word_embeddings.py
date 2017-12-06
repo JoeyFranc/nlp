@@ -57,11 +57,6 @@ train_embedding = Emb.transform(train.news)
 test_embedding = Emb.transform(test.news)
 valid_embedding = Emb.transform(valid.news)
 
-<<<<<<< HEAD
-def get():
-    return train_embedding
-=======
-
 T=len(train['labels'].unique())
 tmp = train['labels']
 tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
@@ -72,4 +67,3 @@ Y_test = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
 tmp = valid['labels']
 tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
 Y_valid = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
->>>>>>> 59086a292c143d11e7a1d33618cbaf0efeee28d5

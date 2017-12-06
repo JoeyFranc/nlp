@@ -10,6 +10,8 @@ from utils import import_classifier
 from utils import is_valid_classifier
 from exceptions import InvalidClassifierError
 
+from module import *
+
 
 
 def _get_classifier(classifier):
@@ -53,11 +55,17 @@ def run_classifier(classifier, word_embeddings, statement_features):
         (np.array) (n,6) - Probability vector representing the
         likelihood of each datapoint belonging to all 6 classes.
     '''
-    if not is_already_trained(classifier, features):
-        train_classifier(
-                classifier,
-                word_embeddings,
-                statement_features,
-                labels)
+#    if not is_already_trained(classifier, features):
+#        train_classifier(
+#                classifier,
+#                word_embeddings,
+#                statement_features,
+#                labels)
     class_module = _get_classifier(classifier)
-    return class_module.run(word_embeddings, statement_features)
+    return class_module.run(
+            train_word_embeddings,
+            test_word_embeddings
+            train_statement_features,
+            test_statement_features,
+            train_labels,
+            test_labels)
