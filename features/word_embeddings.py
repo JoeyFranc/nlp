@@ -60,3 +60,6 @@ Emb = sixfourEmbeddingVectorizer(w2v)
 train_embedding = Emb.transform(train.news)
 test_embedding = Emb.transform(test.news)
 valid_embedding = Emb.transform(valid.news)
+
+def get():
+    return train_embedding
