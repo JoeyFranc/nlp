@@ -65,3 +65,9 @@ valid = load('valid.csv')
 train_uni, test_uni, valid_uni = unigrams(train, test, valid)
 ###### lexicon: LIWC
 LIWC_f = lex_feature(data, LIWC)
+<<<<<<< HEAD
+
+def get():
+    return train_uni
+=======
+>>>>>>> 59086a292c143d11e7a1d33618cbaf0efeee28d5
