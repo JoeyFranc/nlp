@@ -26,7 +26,7 @@ def load(path):
 	data = pd.read_csv(path,header = None)
 	data = data[[1,2]]
 	data.columns = ['labels','news']
-	data['news'] = data['news'].map(lambda x: x.lower().translate(dict((ord(char), None) for char in string.punctuation if char!='\'' and char!='-')) )  
+	data['news'] = data['news'].map(lambda x: x.lower().translate(dict((ord(char), None) for char in string.punctuation if char!='\'' and char!='-')) )
 	data['news'] = data['news'].map(lambda x: x.replace('\n',' '))
 	return data
 
@@ -36,15 +36,10 @@ class sixfourEmbeddingVectorizer(object):
         # if a text is empty we should return a vector of zeros
         # with the same dimensionality as all the other vectors
         self.dim = len(list(word2vec.values())[0])
-
     def fit(self, X, y):
         return self
-
     def transform(self, X):
-        vec = np.array([
-        	np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array([np.zeros(self.dim)]) for w in range(64)])
-            for words in X
-        ])
+        vec = np.array([np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array(np.zeros(self.dim)) for w in range(64)]) for words in X])
         return vec
 
 train = load('train.csv')
@@ -55,11 +50,26 @@ train['news'] = train['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in r
 test['news'] = test['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in re.findall("\S+",x) if re.search('\w',i)!=None])
 valid['news'] = valid['news'].map(lambda x: [nltk.word_tokenize(i)[0] for i in re.findall("\S+",x) if re.search('\w',i)!=None])
 
+train_model, w2v = word2vec(train, 'train')
 
 Emb = sixfourEmbeddingVectorizer(w2v)
 train_embedding = Emb.transform(train.news)
 test_embedding = Emb.transform(test.news)
 valid_embedding = Emb.transform(valid.news)
 
+<<<<<<< HEAD
 def get():
     return train_embedding
+=======
+
+T=len(train['labels'].unique())
+tmp = train['labels']
+tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
+Y_train = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
+tmp = test['labels']
+tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
+Y_test = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
+tmp = valid['labels']
+tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
+Y_valid = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
+>>>>>>> 59086a292c143d11e7a1d33618cbaf0efeee28d5
