@@ -24,13 +24,13 @@ def load_lex(path = '/media/ruijiang/Windows/E/umich/NLP/project /dataset/LIWC.a
 	lex = pd.DataFrame([i.split(' ,') for i in lex])
 	return lex
 
-def lex_feature(data, lex):
-	data = data.copy()
-	data['news'] = data['news'].map(lambda x: [i for i in re.findall("\S+",x) if re.search('\w',i)!=None])
-	for cl in set(lex[1]):
-		words = lex[lex[1]==cl][0]
-		data[cl] = data.news.map(lambda x: sum([1. for j in words for k in x if re.match(j,k)]))
-	return data
+def lex_feature(data,lex):
+    data = data.copy()
+    data['news'] = data['news'].map(lambda x: [i.lower() for i in re.findall("\S+",x) if re.search('\w',i)!=None])
+    for cl in set(lex[1]):
+        words = lex[lex[1]==cl][0]
+        data[cl] = data.news.map(lambda x: sum([1. for j in words for k in x if re.match('^'+j.replace('*','.+')+'$',k)]))
+    return data
 
 def word2vec(data,filename):
 	model = gensim.models.Word2Vec(data.news.tolist(),size=100)
