@@ -10,6 +10,8 @@ from keras.utils import np_utils
 from sklearn.metrics import log_loss
 from keras import __version__ as keras_version
 from keras import backend as KK
+from keras import initializers
+from keras.layers.normalization import BatchNormalization
 #X_train1 = np.random.random((200, 100, 80,1))
 #X_valid1 = np.random.random((100, 100, 80,1))
 #X_train2 = np.random.random((200, 5,1))
@@ -24,42 +26,44 @@ from keras import backend as KK
 
 def create_model(F, K, C, T):
     first = Sequential()
-    first.add(Conv2D(filters = 32, kernel_size = (3, 3),input_shape=(F,K,1), activation = 'relu'))
-    first.add(MaxPooling2D((2, 2)))
+    first.add(Conv2D(filters=16, input_shape=(F, K, 1), padding="same",kernel_initializer=initializers.glorot_normal(seed=123),kernel_size=(3, 3), activation='relu'))
+    first.add(MaxPooling2D((2, 2), strides=(2, 2)))
+    first.add(Conv2D(filters=16, padding="same",kernel_initializer=initializers.glorot_normal(seed=123), kernel_size=(8, 8),activation='relu'))
+    first.add(MaxPooling2D((2, 2), strides=(2, 2)))
+    first.add(Dropout(0.8, seed=12))
     first.add(Flatten())
     second = Sequential()
-    second.add(Convolution1D(16, kernel_size = 2, input_shape = (C,1), activation='relu'))
-    second.add(Bidirectional(LSTM(8)))
+    second.add(Convolution1D(10, kernel_size = 2, kernel_initializer=initializers.glorot_normal(seed=123),input_shape = (C,1), activation='relu'))
+    second.add(Bidirectional(LSTM(8,kernel_initializer=initializers.glorot_normal(seed=123))))
     model = Sequential()
     model.add(Merge([first, second], mode='concat'))
-    model.add(Dense(T, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(T, activation = 'softmax'))
+    model.add(Dense(T,kernel_initializer=initializers.glorot_normal(seed=123), activation = 'softmax'))
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy',
-                  optimizer="sgd",
+                  optimizer=sgd,
                   metrics=['accuracy'])
     return model
 
 #suppose word_embedding _matrix n * f * k, feature_matrix n* c, label with one-hot encoding n*t
 #Y_train = keras.utils.to_categorical(label1, num_classes=6) for one-hot encoding
 
-def hcnn(word_embedding_matrix, feature_matrix, label_matrix):
-    batch_size = 4
-    nb_epoch = 5
-    N, F, K = word_embedding_matrix.shape
-    C = feature_matrix.shape[1]
-    T = label_matrix.shape[1]
-    X1 = word_embedding_matrix.reshape(N, F, K, 1)
-    X2 = feature_matrix.reshape(N, C, 1)
-    random.seed(123)
-    random_ind = random.sample(range(N), N)
-    train_ind = random_ind[0:int(N*0.8)]
-    valid_ind = random_ind[int(N*0.8):N]
+def run(m_train, m_test, feature_train, feature_test, y_train, y_test):
+    batch_size = 10
+    nb_epoch = 50
+    N, F, K = m_train.shape
+    m_train = m_train.reshape(N,F,K,1)
+    m_test = m_test.reshape(m_test.shape + (1,))
+    C = feature_train.shape[1]
+    T = y_train.shape[1]
+    feature_train = feature_train.reshape(N, C, 1)
+    feature_test = feature_test.reshape(feature_test.shape+(1,))
     model = create_model(F, K, C, T)
     callbacks = [EarlyStopping(monitor='val_loss', patience=nb_epoch, verbose=0)]
-    history = model.fit([X1[train_ind,:,:,:], X2[train_ind,:,:]], label_matrix[train_ind,:], batch_size=batch_size, nb_epoch=nb_epoch, \
-                        shuffle=True, verbose=2, validation_data=([X1[valid_ind,:,:,:], X2[valid_ind,:,:]], label_matrix[valid_ind,:]), \
+    history = model.fit([m_train, feature_train], y_train, batch_size=batch_size, nb_epoch=nb_epoch, \
+                        shuffle=True, verbose=2, validation_data=([m_test, feature_test], y_test), \
                         callbacks=callbacks)  # record history by JH
-    return (model.predict([X1, X2], batch_size=batch_size, verbose=2))
+    model.save('hcnn_glorot_0.01_10.h5')
+    return (model.predict([m_test, feature_test], batch_size=batch_size, verbose=2))
 	
 
+tmp = run(train_embedding, test_embedding,feature_train, feature_test, Y_train, Y_test)

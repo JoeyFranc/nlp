@@ -39,7 +39,7 @@ class sixfourEmbeddingVectorizer(object):
     def fit(self, X, y):
         return self
     def transform(self, X):
-        vec = np.array([np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array(np.zeros(self.dim)) for w in range(64)]) for words in X])
+        vec = np.array([np.array([self.word2vec[words[w]] if w<(len(words))and words[w] in self.word2vec else np.array(np.zeros(self.dim)) for w in range(32)]) for words in X])
         return vec
 
 train = load('train.csv')
@@ -57,6 +57,9 @@ train_embedding = Emb.transform(train.news)
 test_embedding = Emb.transform(test.news)
 valid_embedding = Emb.transform(valid.news)
 
+def get():
+    return train_embedding
+
 T=len(train['labels'].unique())
 tmp = train['labels']
 tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
@@ -67,3 +70,7 @@ Y_test = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
 tmp = valid['labels']
 tmp = tmp.replace('0', 0).replace('1', 5).replace('pants-fire', 1).replace('mostly-true', 4).replace('barely-true',2).replace('half-true',3)
 Y_valid = keras.utils.to_categorical(tmp.tolist(), num_classes=T)
+
+
+feature_train = np.asarray(pd.read_csv('liwc_train.csv', sep = ',').iloc[:,3:72])
+feature_test = np.asarray(pd.read_csv('liwc_test.csv', sep = ',').iloc[:,3:72])
