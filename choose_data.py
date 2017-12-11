@@ -7,9 +7,12 @@
 
 
 
+import numpy as np
 import pandas as pd
+import string
 
 from utils import get_data_file_name
+from utils import map_label
 
 
 
@@ -27,3 +30,11 @@ def load_data():
     train = _load('train.csv')
     test = _load('test.csv')
     return train, test
+
+def get_labels(train_data, test_data):
+    y_train = np.array([map_label(label)
+            for label in train_data['labels']])
+    y_test = np.array([map_label(label)
+            for label in test_data['labels']])
+    return (y_train, y_test)
+        

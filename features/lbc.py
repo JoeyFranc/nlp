@@ -8,6 +8,7 @@
 
 import numpy as np
 import nltk
+import string
 
 
 
@@ -35,7 +36,7 @@ def _get_num_occurances(set_1, set_2):
 class DataPoint(object):
     
     def __init__(self, datapoint):
-        self.dp = datapoint
+        self.dp = datapoint.lower()
         self.words = nltk.word_tokenize(self.dp)
         self.tagged = nltk.pos_tag(self.words)
         self.pos = [tag for word, tag in self.tagged]
@@ -187,7 +188,3 @@ def get(train_data, test_data):
     test_set = get_datapoints(test_data['news'])
     train_set = get_datapoints(train_data['news'])
     return train_set, test_set
-
-
-if __name__ == '__main__':
-    get()

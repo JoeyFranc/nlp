@@ -12,17 +12,20 @@ import os
 '''
     Constants
 '''
-FEATURE_FILE_SUFFIX = 'data'
+FEATURE_FILE_SUFFIX = 'pickle'
 CLASSIFIER_PATH = 'classifiers'
+DATA_PATH = 'data'
 FEATURE_PATH = 'features'
 OUT_FILE_SUFFIX = 'txt'
 LABEL_MAP = {
         'pants-fire': 0,
         'false': 1,
+        '0': 1,
         'barely-true': 2,
         'half-true': 3,
         'mostly-true': 4,
-        'true': 5}
+        'true': 5,
+        '1': 5}
 
 
 
@@ -51,7 +54,7 @@ def is_valid_feature(feature):
 
 
 def get_feature_file_name(feature):
-    return feature + '.' + FEATURE_FILE_SUFFIX
+    return FEATURE_PATH + '/' + feature + '.' + FEATURE_FILE_SUFFIX
 
 
 def get_out_file_name(classifier, features):
@@ -63,13 +66,22 @@ def get_out_file_name(classifier, features):
     return name
 
 
-def get_liwc_path():
-    return '/media/ruijiang/Windows/E/umich/NLP/project /dataset/LIWC.all.txt'
+def get_data_file_name(data):
+    return DATA_PATH + '/' + data
+
+
+#def get_liwc_path():
+#    return '/media/ruijiang/Windows/E/umich/NLP/project /dataset/LIWC.all.txt'
 
 
 def import_feature(feature):
-    return __import__(FEATURE_PATH + '.' + feature + '.py')
+    return getattr(__import__(FEATURE_PATH + '.' + feature), feature)
 
 
 def import_classifier(classifier):
-    return __import__(CLASSIFIER_PATH + '.' + classifier + '.py')
+    return getattr(__import__(CLASSIFIER_PATH + '.' + classifier),
+                   classifier)
+
+
+def map_label(label):
+    return LABEL_MAP[label]

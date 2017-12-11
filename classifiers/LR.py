@@ -7,10 +7,11 @@
 
 
 from sklearn import linear_model
+from sklearn.model_selection import GridSearchCV
 
 
 
-def get(X_train, X_test, y_train, y_test):
+def run_classifier(X_train, X_test, y_train, y_test):
     _, statement_features_train = X_train
     _, statement_features_test = X_test
     lr = linear_model.LogisticRegression(multi_class='multinomial',solver='lbfgs',max_iter=1000)

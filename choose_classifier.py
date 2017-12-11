@@ -10,13 +10,11 @@ from utils import import_classifier
 from utils import is_valid_classifier
 from exceptions import InvalidClassifierError
 
-from module import *
-
 
 
 def _get_classifier(classifier):
     if is_valid_classifier(classifier):
-        return __import__(classifier)
+        return import_classifier(classifier)
     raise InvalidClassifierError(classifier)
 
 
@@ -39,18 +37,25 @@ def train_classifier(classifier, word_embeddings, statement_features, labels):
     return class_module.train(word_embeddings, statement_features)
 
 
-def run_classifier(classifier, word_embeddings, statement_features):
+def run_classifier(
+        classifier,
+        train_features,
+        test_features,
+        train_labels,
+        test_labels):
     '''
     About:
         Classifies the inputted datapoints.
     Input:
         classifier (string) - The name of a valid classifier.
         
-        word_embeddings (np.array) (n x k x f) - Feature vectors for
-        each word in the datapoint.
-        
-        statement_features (np.array) (n x c) - Feature vectors for
-        each datapoint.
+        train_features, test_features (tuple) -
+        Two tuples of the following form:
+            word_embeddings (np.array) (n x k x f) - Feature
+            vectors for each word in the datapoint.
+
+            statement_features (np.array) (n x c) - Feature
+            vectors for each datapoint.
     Returns:
         (np.array) (n,6) - Probability vector representing the
         likelihood of each datapoint belonging to all 6 classes.
@@ -62,10 +67,8 @@ def run_classifier(classifier, word_embeddings, statement_features):
 #                statement_features,
 #                labels)
     class_module = _get_classifier(classifier)
-    return class_module.run(
-            train_word_embeddings,
-            test_word_embeddings
-            train_statement_features,
-            test_statement_features,
+    return class_module.run_classifier(
+            train_features,
+            test_features,
             train_labels,
             test_labels)
