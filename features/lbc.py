@@ -3,60 +3,11 @@
     @author Joey Franc
     
     Linguistic-Based Cues (LBC) used as statement feature representation.
-    18 different features in total.
+    16 different features in total.
 '''
 
 import numpy as np
 import nltk
-
-import pandas as pd
-import string
-import re
-import nltk
-import scipy
-import sklearn.feature_extraction.text
-import numpy as np
-
-from sklearn.svm import SVC
-from sklearn.svm import LinearSVC
-from sklearn import linear_model
-from collections import Counter
-from nltk.stem import PorterStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk import word_tokenize
-from nltk.util import ngrams
-from sklearn.preprocessing import OneHotEncoder
-
-def load(path):
-    data = pd.read_csv(path,header = None)
-    data = data[[1,2]]
-    data.columns = ['labels','news']
-    data['news'] = data['news'].map(lambda x: x.lower().translate(dict((ord(char), None) for char in string.punctuation if char!='\'' and char!='-')) )  
-    data['news'] = data['news'].map(lambda x: x.replace('\n',' '))
-    return data
-
-# if we want to calculate correlation, we shall rewrite those str lables
-def repl(t):
-    t.replace('half-true','0.5', inplace=True)
-    t.replace('mostly-true','0.8', inplace=True)
-    t.replace('barely-true','0.3', inplace=True)
-    t.replace('pants-fire','-1', inplace=True)
-
-def lex_feature(data,lex):
-    data = data.copy()
-    data['news'] = data['news'].map(lambda x: [i.lower() for i in re.findall("\S+",x) if re.search('\w',i)!=None])
-    for cl in set(lex[1]):
-        words = lex[lex[1]==cl][0]
-        data[cl] = data.news.map(lambda x: sum([1. for j in words for k in x if re.match('^'+j.replace('*','.+')+'$',k)]))
-    return data
-
-def unigrams(data, test):
-    data = data.copy()
-    Vectorizer = sklearn.feature_extraction.text.TfidfVectorizer(min_df = 20)
-    unig = Vectorizer.fit_transform(data.news)
-    train_f = pd.DataFrame(unig.todense(),columns = Vectorizer.get_feature_names())
-    test_f = pd.DataFrame(Vectorizer.transform(test.news).todense(),columns = Vectorizer.get_feature_names())
-    return train_f, test_f
 
 
 
@@ -232,12 +183,8 @@ def get_datapoints(data_set):
 
 
 
-def get():
-    train_data = load('train.csv')
-    test_data = load('test.csv')
-    #dev_data = load('dev.csv')
+def get(train_data, test_data):
     test_set = get_datapoints(test_data['news'])
-    #dev_set = get_datapoints(dev_data)
     train_set = get_datapoints(train_data['news'])
     return train_set, test_set
 

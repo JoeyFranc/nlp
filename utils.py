@@ -2,6 +2,9 @@
     utils.py
     @author Joey Franc
 '''
+
+
+
 import os
 
 
@@ -17,7 +20,7 @@ LABEL_MAP = {
         'pants-fire': 0,
         'false': 1,
         'barely-true': 2,
-        'half-true': 3
+        'half-true': 3,
         'mostly-true': 4,
         'true': 5}
 
@@ -60,26 +63,13 @@ def get_out_file_name(classifier, features):
     return name
 
 
+def get_liwc_path():
+    return '/media/ruijiang/Windows/E/umich/NLP/project /dataset/LIWC.all.txt'
+
+
 def import_feature(feature):
     return __import__(FEATURE_PATH + '.' + feature + '.py')
 
 
 def import_classifier(classifier):
     return __import__(CLASSIFIER_PATH + '.' + classifier + '.py')
-
-
-def _load_file(file_name):
-    labels = []
-    with open(file_name, 'rb') as file:
-        for line in file:
-            fields = line.split()
-            label = LABEL_MAP[fields[1]]
-            labels.append(label)
-    return np.array(labels)
-
-
-def load_labels():
-    train = _load_file('train.tsv')
-    valid = _load_file('valid.tsv')
-    test = _load_file('test.tsv')
-    return (train, valid, test)
