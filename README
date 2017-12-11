@@ -1,41 +1,163 @@
-LIAR: A BENCHMARK DATASET FOR FAKE NEWS DETECTION
+================================================================================
 
-William Yang Wang, "Liar, Liar Pants on Fire": A New Benchmark Dataset for Fake News Detection, to appear in Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (ACL 2017), short paper, Vancouver, BC, Canada, July 30-August 4, ACL.
-=====================================================================
-Description of the TSV format:
+            Project Suite for Deception Detection in Political Speech
 
-Column 1: the ID of the statement ([ID].json).
-Column 2: the label.
-Column 3: the statement.
-Column 4: the subject(s).
-Column 5: the speaker.
-Column 6: the speaker's job title.
-Column 7: the state info.
-Column 8: the party affiliation.
-Column 9-13: the total credit history count, including the current statement.
-9: barely true counts.
-10: false counts.
-11: half true counts.
-12: mostly true counts.
-13: pants on fire counts.
-Column 14: the context (venue / location of the speech or statement).
+              By Jiahua Chen, Joey Franc, Ruijiang Gao, Yujing Zhou             
 
-Note that we do not provide the full-text verdict report in this current version of the dataset,
-but you can use the following command to access the full verdict report and links to the source documents:
-wget http://www.politifact.com//api/v/2/statement/[ID]/?format=json
+================================================================================
+            
+              ____            _        _    _                      
+             |  _ \          (_)      | |  | |                     
+             | |_) | __ _ ___ _  ___  | |  | |___  __ _  __ _  ___ 
+             |  _ < / _` / __| |/ __| | |  | / __|/ _` |/ _` |/ _ \
+             | |_) | (_| \__ \ | (__  | |__| \__ \ (_| | (_| |  __/
+             |____/ \__,_|___/_|\___|  \____/|___/\__,_|\__, |\___|
+                                                         __/ |     
+                                                       |____/
 
-======================================================================
-The original sources retain the copyright of the data.
+================================================================================
 
-Note that there are absolutely no guarantees with this data,
-and we provide this dataset "as is",
-but you are welcome to report the issues of the preliminary version
-of this data.
+RUNNING THE PROGRAM:
 
-You are allowed to use this dataset for research purposes only.
+    python pipeline.py [classifier] [feature list]
 
-For more question about the dataset, please contact:
-William Wang, william@cs.ucsb.edu
+This command trains a [classifier] using the feature set described in
+[feature list].  
 
-v1.0 04/23/2017
 
+
+PARAMETERS:
+
+    [classifier]    A single name of a valid .py file in the classifiers
+                    directory.  Out of the box, these can be one of:
+                        [CNN, hybridcnn, LR, SVM]
+                    This tells the program what classifier to train and test.
+                    
+    [feature list]  A sequence of one-or-more whitespace-seperated
+                    .py files in teh features directory.  Out of the box, these
+                    can be one of:  [affect, lbc, lexicon, liwc, moral,
+                        unigrams, word_embeddings]
+                    This tells the program which features to represent data with
+
+
+
+================================================================================
+ 
+               _     _ _               ______         _                       
+      /\      | |   | (_)             |  ____|       | |                      
+     /  \   __| | __| |_ _ __   __ _  | |__ ___  __ _| |_ _   _ _ __ ___  ___ 
+    / /\ \ / _` |/ _` | | '_ \ / _` | |  __/ _ \/ _` | __| | | | '__/ _ \/ __|
+   / ____ \ (_| | (_| | | | | | (_| | | | |  __/ (_| | |_| |_| | | |  __/\__ \
+  /_/    \_\__,_|\__,_|_|_| |_|\__, | |_|  \___|\__,_|\__|\__,_|_|  \___||___/
+                                __/ |                                         
+                               |___/                                          
+                                         
+================================================================================
+
+NAMING YOUR FEATURE:
+
+Simply give your feature a unique name and create a file named [feature].py in
+the features/ directory.  This file has the following specifications:
+
+
+
+FILE REQUIREMENTS:
+
+1. get(train_data, test_data)
+
+You must define a function named get that accepts two parameters.  These are
+data frames with two labels:
+
+    'labels' : The label as a string.
+    'news'   : A string of the classified statement.
+    
+2. get returns a 2-tuple of EXACTLY ONE of the following forms:
+
+    (np.array<size=(N_train,C)>, np.array<size=(N_test,C)>)
+        OR
+    (np.array<size=(N_train,64,F)>, np.array<size=(N_test,64,F)>)
+    
+where these forms represent features that are statement features or
+word embeddings (capped to 64 words in a sentence), respectively.
+
+
+
+================================================================================
+
+                   _     _ _               __  __           _      _     
+          /\      | |   | (_)             |  \/  |         | |    | |    
+         /  \   __| | __| |_ _ __   __ _  | \  / | ___   __| | ___| |___ 
+        / /\ \ / _` |/ _` | | '_ \ / _` | | |\/| |/ _ \ / _` |/ _ \ / __|
+       / ____ \ (_| | (_| | | | | | (_| | | |  | | (_) | (_| |  __/ \__ \
+      /_/    \_\__,_|\__,_|_|_| |_|\__, | |_|  |_|\___/ \__,_|\___|_|___/
+                                    __/ |                                
+                                   |___/                                 
+                                    
+================================================================================
+
+NAMING YOUR MODEL:
+
+Simply give your feature a unique name and create a file named [model].py in
+the classifiers/ directory.  This file has the following specifications:
+
+
+
+FILE REQUIREMENTS:
+
+1. run_classifier(train_data, test_data, train_labels, test_labels)
+
+You must define a function named get that accepts four parameters.  These are
+2 tuples of feature matricies of the form:
+
+    (word_embeddings, statement_features)
+    
+for training and testing data respectively.
+
+The other features are simply arrays of np.ints representing the classification
+of each piece of data.
+    
+2. run_classifier returns an (N_train,) array of ints representing the predicted
+labels of the model.
+
+
+
+================================================================================
+
+                _____        _          _    _              _ 
+               |  __ \      | |        | |  | |            | |
+               | |  | | __ _| |_ __ _  | |  | |___  ___  __| |
+               | |  | |/ _` | __/ _` | | |  | / __|/ _ \/ _` |
+               | |__| | (_| | || (_| | | |__| \__ \  __/ (_| |
+               |_____/ \__,_|\__\__,_|  \____/|___/\___|\__,_|
+                                                
+                                                
+================================================================================
+
+This project uses subsets of several datasets and includes them in this file. We
+are not able to provide all of the datasets in their entirety, however. Instead,
+we list here the datasets used and where they can be found.
+
+Liar, Liar Pants on Fire  https://www.cs.ucsb.edu/~william/data/liar_dataset.zip
+LIWC                      https://liwc.wpengine.com/
+Wordnet - Affect          http://wndomains.fbk.eu/wnaffect.html
+    
+
+
+================================================================================
+
+               __          __              _                 
+               \ \        / /             (_)                
+                \ \  /\  / /_ _ _ __ _ __  _ _ __   __ _ ___ 
+                 \ \/  \/ / _` | '__| '_ \| | '_ \ / _` / __|
+                  \  /\  / (_| | |  | | | | | | | | (_| \__ \
+                   \/  \/ \__,_|_|  |_| |_|_|_| |_|\__, |___/
+                                                    __/ |    
+                                                   |___/     
+                                     
+================================================================================
+
+AUTO-CACHEING
+
+This program will autocache generated features by pickling them.  If you change
+a feature file, you must delete the [feature].pickle file in the features/
+directory.
